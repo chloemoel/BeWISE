@@ -1,0 +1,7 @@
+*.config
+work/
+.nextflow/
+outputs/
+*.log*
+*.sif
+*.img
