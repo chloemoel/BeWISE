@@ -1,12 +1,12 @@
 # BeWISE
 
-This tool is intended to be used to used to create a gene burden score based on DNA methylation. This is done  with BeWISE (Burden Estimate from Weighted Integration of Site-specific Epigenetic Changes)
+BeWISE (Burden Estimate from Weighted Integration of Site-specific Epigenetic Changes) is intended to be used to used to create a measure of gene burden using DNA methylation data.
 
 ## Getting Started
 
 ### Installation
 
-BeWise is run using [Nextflow](https://www.nextflow.io). There are several ways to install and manage Nextflow as noted on their website. Once installed, run the following to insure proper setup. 
+BeWISE is run using [Nextflow](https://www.nextflow.io). There are several ways to install and manage Nextflow as noted on their website. Once installed, run the following to insure proper setup. 
 
 ```
 # Run from directory that nextflow is installed in
@@ -20,7 +20,11 @@ git clone https://github.com/chloemoel/BeWISE
 
 cd BeWISE
 ```
+To install necessary data files, run: 
 
+```
+./install.sh
+```
 
 This workflow is written to work with a container system. There is no container install needed before running the pipeline, as Nextflow will find, install, and cache the container. The example config file mentioned below shows how to use and set a cache directory. This workflow will work with Apptainer, Singularity, or Docker systems.
 
@@ -30,11 +34,36 @@ This pipeline is run dependent on a nextflow config file saved in the base direc
 You can find more information on config files [here](https://www.nextflow.io/docs/latest/config.html)
 
 ### Input File formats
+Depending on your methylation data, you will need the following files:
 
-* sample_sheet (csv file) -- This sample sheet is based on the Illumina sample sheet format with headers as follows: Sample_Name,Sample_Well,Sample_Plate,Sample_Group,Pool_ID,Sentrix_ID,Sentrix_Position. Only Sample_Name, Sentrix_ID, and Sentrix_Position are required. Sample name MUST match the headers of the vcf file. 
+#### Array data 
+* sample_sheet (csv file) -- this sample sheet is used for the BeWISE calculation only, as the genetic score depends on a vcf with headers as study id names. This sample sheet is based on the Illumina sample sheet format with headers as follows: 
+```
+Sample_Name,Sample_Well,Sample_Plate,Sample_Group,Pool_ID,Sentrix_ID,Sentrix_Position. 
+```
+Only ```Sample_Name, Sentrix_ID, and Sentrix_Position``` are required.  
 * additional_data (csv file) -- this a sheet with additional data used for batch correction during the BeWISE calculation. This csv file must contain the study id in the first column, and then any other information in subsequent columns
 * sample_m_vals (csv file) -- a file with probes as rows and samples as columns. Samples should be in the [Sentrix_ID]_[Sentrix_Position] format. To calculate m values, we use `SeSAME` (more info can be found [here](https://zhou-lab.github.io/sesame/v1.16/sesame.html)). Probes should be in either the EPIC or 450k array format (NOT EPICv2). 
 * batch_correction -- list of variables to correct for in batch correction during BeWISE. Should be either in the sample_sheet file (ie, Sentrix_ID for chip correction) or a column from the additional data file. 
+
+#### Sequencing (bisulfite conversion, long-read)
+To use bisulfite data with BeWISE, make sure to add the following to your config file:
+
+'''
+params.sequencing_type = "bisulfite"
+'''
+
+* additional_data (csv file) -- this a sheet with additional data used for batch correction during the BeWISE calculation. This csv file must contain the study id in the first column, and then any other information in subsequent columns.
+* bisulfite_files (csv files) -- files that for each sample have the headers:
+```
+chromosome,start,stop,sample_name
+```
+Where the column cotains beta values for each site.**Locations should be 0-based, and in GRCh37** 
+
+* batch_correction -- list of variables to correct for in batch correction during BeWISE.
+
+**NOTE:** As this data (vs array data) tends to be much larger, the processing step is slightly different. We utilize sqlite to create a database to store data for preprocessing. 
+
 
 ### Useage
 
