@@ -1,4 +1,5 @@
 #!/bin/bash
+mkdir -p bin/data
 cd bin/data
 
 wget https://m-42bb44.6ba50.0ec8.data.globus.org/Shared/darbro-cytogenetics/Chloe/CombinedBurdenEstimate/bin/data/probe_info.csv.gz
