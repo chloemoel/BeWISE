@@ -2,8 +2,8 @@
 mkdir -p bin/data
 cd bin/data
 
-wget https://m-42bb44.6ba50.0ec8.data.globus.org/Shared/darbro-cytogenetics/Chloe/CombinedBurdenEstimate/bin/data/probe_info.csv.gz
+wget https://github.com/chloemoel/MagicWiseIndex/releases/download/v.0.0.2/probe_info.csv.gz
 echo "Unzipping methylation probe info..."
-gunzip probe_info.csv.gz
+tar -xvf probe_info.csv.gz
 
 echo "All done!"
